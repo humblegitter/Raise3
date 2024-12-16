@@ -18,8 +18,8 @@ export default function LandingPage() {
     renderer.setSize(window.innerWidth, window.innerHeight)
     document.getElementById('globe-container')?.appendChild(renderer.domElement)
 
-    // Create globe with reduced segments for pixelated look
-    const globeGeometry = new THREE.SphereGeometry(5, 32, 16)
+    // Create globe with more segments for smoother look while keeping retro style
+    const globeGeometry = new THREE.SphereGeometry(5, 64, 32)
     const globeMaterial = new THREE.MeshStandardMaterial({
       map: new THREE.TextureLoader().load('/fonts/assets/8 bit map.jpg'),
       roughness: 1,
@@ -79,7 +79,36 @@ export default function LandingPage() {
     }
     animate()
 
+    // Animate RAISE3 letters
+    gsap.to('.letter', {
+      y: 0,
+      opacity: 1,
+      duration: 2.5,
+      stagger: 0.4,
+      ease: 'back.out(1.7)'
+    })
+
+    // Start typing effect after logo animation
+    let currentIndex = 0
+    const typewriterDelay = setTimeout(() => {
+      const typeInterval = setInterval(() => {
+        if (currentIndex <= fullText.length) {
+          setButtonText(fullText.slice(0, currentIndex))
+          currentIndex++
+        } else {
+          clearInterval(typeInterval)
+          gsap.to('.enter-button', {
+            opacity: 1,
+            duration: 0.5
+          })
+        }
+      }, 100)
+
+      return () => clearInterval(typeInterval)
+    }, 2500)
+
     return () => {
+      clearTimeout(typewriterDelay)
       window.removeEventListener('mousemove', onMouseMove)
       renderer.dispose()
     }
@@ -89,7 +118,25 @@ export default function LandingPage() {
     <div className="fixed inset-0 overflow-hidden bg-black">
       <div id="globe-container" className="absolute inset-0" />
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        {/* Your existing RAISE³ content */}
+        <h1 className="text-9xl font-['Daydream'] text-white z-10">
+          {["R","A","I","S","E"].map((letter, index) => (
+            <span 
+              key={index} 
+              className="letter opacity-0 inline-block"
+              style={{ transform: 'translateY(20px)' }}
+            >
+              {letter}
+            </span>
+          ))}
+          <sup className="text-6xl relative -top-20 letter opacity-0">3</sup>
+        </h1>
+        <button 
+          className="enter-button mt-24 opacity-0 font-['Daydream'] text-2xl text-white hover:scale-110 transition-transform duration-200 relative mx-auto block pointer-events-auto"
+          onClick={() => setIsTransitioning(true)}
+        >
+          {buttonText}
+          <span className="animate-blink">|</span>
+        </button>
       </div>
     </div>
   )
