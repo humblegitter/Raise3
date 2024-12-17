@@ -307,7 +307,7 @@ export default function LandingPage() {
             <div id="globe-container" className="absolute inset-0" />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="logo-container">
-                <h1 className="text-9xl font-['Daydream'] text-white z-10">
+                <h1 className="text-5xl md:text-7xl lg:text-9xl font-['Daydream'] text-white z-10 flex flex-row flex-wrap justify-center items-center">
                   {["R","A","I","S","E"].map((letter, index) => (
                     <span 
                       key={index} 
@@ -318,7 +318,7 @@ export default function LandingPage() {
                     </span>
                   ))}
                   <sup 
-                    className="text-6xl relative -top-20 letter opacity-0 transition-all duration-300"
+                    className="text-3xl md:text-4xl lg:text-6xl relative lg:-top-20 md:-top-14 -top-8 letter opacity-0 transition-all duration-300"
                   >
                     3
                   </sup>
