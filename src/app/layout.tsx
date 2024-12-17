@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon/r3 logo.png",
+        url: "./favicon/r3logo.png",
         sizes: "1000x1000",
         type: "image/png",
       }
     ],
     apple: [
       {
-        url: "/favicon/r3 logo.png",
+        url: "./favicon/r3logo.png",
         sizes: "1000x1000",
         type: "image/png",
       }
