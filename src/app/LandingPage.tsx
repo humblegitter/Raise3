@@ -106,7 +106,7 @@ export default function LandingPage() {
         launchText.textContent = ''
         gsap.to(launchText, { opacity: 1, duration: 0.1 })
         
-        const launchDuration = text.length * 0.1 // Calculate total duration
+        const launchDuration = text.length * 0.1
         
         text.split('').forEach((char, i) => {
           gsap.to(launchText, {
@@ -118,23 +118,17 @@ export default function LandingPage() {
           })
         })
 
-        // Typewriter effect for documentation button
-        const buttonText = "[ Documentation ]"
-        const docButton = document.querySelector('button')
-        if (docButton) {
-          docButton.textContent = ''
-          gsap.to(docButton, { opacity: 1, duration: 0.1 })
-          
-          buttonText.split('').forEach((char, i) => {
-            gsap.to(docButton, {
-              duration: 0.1,
-              delay: 2 + launchDuration + 0.5 + (i * 0.1), // Start after launch text + small pause
-              onStart: () => {
-                docButton.textContent = buttonText.substring(0, i + 1)
-              }
-            })
+        // Spawn animation for both buttons
+        const buttons = document.querySelectorAll('button')
+        buttons.forEach((button, index) => {
+          gsap.to(button, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+            delay: 2 + launchDuration + 0.5 + (index * 0.5) // Sequential spawn with 0.5s gap
           })
-        }
+        })
       }
 
       // Main directional light
@@ -263,7 +257,7 @@ export default function LandingPage() {
         y: 0,
         duration: 0.5,
         ease: 'power2.out',
-        delay: 1.75 // Appears after logo, before documentation button
+        delay: 1.75
       })
 
       gsap.to('button', {
@@ -271,7 +265,8 @@ export default function LandingPage() {
         y: 0,
         duration: 0.5,
         ease: 'power2.out',
-        delay: 2 // Keeps existing delay
+        delay: 2,
+        stagger: 0.5 // Add stagger for sequential button animations
       })
 
       // Cleanup
@@ -331,11 +326,18 @@ export default function LandingPage() {
                 Launching April 2025...
               </p>
               <button 
-                className="absolute bottom-32 text-cyan-400 font-mono text-xl opacity-0 hover:text-white transition-colors duration-300"
+                className="absolute bottom-28 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
                 style={{ transform: 'translateY(20px)' }}
                 onClick={() => window.open('https://app.gitbook.com/invite/RchIfOacX2i9zA51W2fm/oeBqz13ORTmzaPOd8ynP', '_blank')}
               >
-                [ Documentation ]
+                Documentation
+              </button>
+              <button 
+                className="absolute bottom-8 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
+                style={{ transform: 'translateY(20px)' }}
+                onClick={() => console.log('Connect wallet clicked')}
+              >
+                Connect Wallet
               </button>
             </div>
           </>
