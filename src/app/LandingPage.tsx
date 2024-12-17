@@ -5,39 +5,55 @@ import * as THREE from 'three'
 
 export default function LandingPage() {
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [buttonText, setButtonText] = useState('')
-  const fullText = 'Click to Enter'
   const globeRef = useRef<THREE.Mesh>(null)
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
+  const raycasterRef = useRef(new THREE.Raycaster())
+  const mouseRef = useRef(new THREE.Vector2())
+  const particlesRef = useRef<THREE.Mesh[]>([])
 
   useEffect(() => {
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0x000000)
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    cameraRef.current = camera
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
     
     renderer.setSize(window.innerWidth, window.innerHeight)
     document.getElementById('globe-container')?.appendChild(renderer.domElement)
 
-    // Create globe with more segments for smoother look while keeping retro style
-    const globeGeometry = new THREE.SphereGeometry(5, 64, 32)
-    const globeMaterial = new THREE.MeshStandardMaterial({
-      map: new THREE.TextureLoader().load('/fonts/assets/8 bit map.jpg'),
-      roughness: 1,
-      metalness: 0,
-      emissive: new THREE.Color(0x222222),
-      emissiveIntensity: 0.3,
+    // Create particles for globe immediately
+    const particles: THREE.Mesh[] = []
+    const radius = 5
+    const count = 2000
+
+    const particleMaterial = new THREE.MeshPhongMaterial({
+      color: 0x00ffff,
+      emissive: 0x00ffff,
+      emissiveIntensity: 0.5,
       flatShading: true,
     })
-    
-    // Set texture filtering to nearest for pixelated look
-    if (globeMaterial.map) {
-      globeMaterial.map.minFilter = THREE.NearestFilter
-      globeMaterial.map.magFilter = THREE.NearestFilter
+
+    // Create particles in a sphere formation
+    for (let i = 0; i < count; i++) {
+      const phi = Math.acos(-1 + (2 * i) / count)
+      const theta = Math.sqrt(count * Math.PI) * phi
+
+      const particle = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.1, 0.1),
+        particleMaterial.clone()
+      )
+
+      particle.position.setFromSphericalCoords(
+        radius,
+        phi,
+        theta
+      )
+
+      particles.push(particle)
+      scene.add(particle)
     }
-    
-    const globe = new THREE.Mesh(globeGeometry, globeMaterial)
-    scene.add(globe)
-    globeRef.current = globe
+
+    globeRef.current = particles[0]
 
     // Enhanced lighting setup
     const ambientLight = new THREE.AmbientLight(0x444444, 1.2)
@@ -58,61 +74,95 @@ export default function LandingPage() {
     // Mouse movement handler
     let mouseX = 0
     let mouseY = 0
+    const baseRadius = 5  // Store original radius
 
-    const onMouseMove = (event: MouseEvent) => {
-      mouseX = (event.clientX - window.innerWidth / 2) * 0.002
-      mouseY = (event.clientY - window.innerHeight / 2) * 0.002
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isTransitioning) {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2
+        mouseY = -(e.clientY / window.innerHeight - 0.5) * 2
+      } else {
+        mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
+        mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1
+      }
     }
 
-    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mousemove', handleMouseMove)
 
     // Animation loop
     const animate = () => {
+      requestAnimationFrame(animate)
+      
       if (!isTransitioning) {
-        requestAnimationFrame(animate)
+        const time = Date.now() * 0.001 // For wave animation
         
-        globe.rotation.y += (mouseX - globe.rotation.y) * 0.02
-        globe.rotation.x += (mouseY - globe.rotation.x) * 0.02
-        
-        renderer.render(scene, camera)
+        particles.forEach(particle => {
+          // Get the original normalized position
+          const normalizedPos = particle.position.clone().normalize()
+          
+          // Calculate distance from mouse position to particle
+          const mousePos = new THREE.Vector3(mouseX * 10, -mouseY * 10, 0)
+          const distanceToMouse = particle.position.distanceTo(mousePos)
+          
+          // Wave effect
+          const waveX = Math.sin(particle.position.x * 0.5 + time) * 0.5
+          const waveY = Math.cos(particle.position.y * 0.5 + time) * 0.5
+          const wave = (waveX + waveY) * Math.max(0, 1 - distanceToMouse * 0.1)
+          
+          // Apply wave distortion
+          const newRadius = baseRadius + wave
+          particle.position.copy(normalizedPos.multiplyScalar(newRadius))
+          
+          // Glow effect based on distance to mouse
+          const glowIntensity = Math.max(0.5, 2 - distanceToMouse * 0.2)
+          ;(particle.material as THREE.MeshPhongMaterial).emissiveIntensity = glowIntensity
+          
+          // Orbit around center
+          const currentX = particle.position.x
+          const currentZ = particle.position.z
+          const angle = 0.002 // Speed of rotation
+          
+          particle.position.x = currentX * Math.cos(angle) - currentZ * Math.sin(angle)
+          particle.position.z = currentZ * Math.cos(angle) + currentX * Math.sin(angle)
+          
+          // Individual particle rotation
+          particle.rotation.x += 0.001
+          particle.rotation.y += 0.001
+        })
       }
+
+      if (isTransitioning) {
+        raycasterRef.current.setFromCamera(mouseRef.current, camera)
+        const intersects = raycasterRef.current.intersectObjects(particles)
+        
+        particles.forEach(particle => {
+          (particle.material as THREE.MeshPhongMaterial).emissiveIntensity = 0.5
+        })
+
+        intersects.forEach(intersect => {
+          const particle = intersect.object as THREE.Mesh
+          (particle.material as THREE.MeshPhongMaterial).emissiveIntensity = 2
+        })
+      }
+      
+      renderer.render(scene, camera)
     }
     animate()
 
-    // Animate RAISE3 letters
-    gsap.to('.letter', {
-      y: 0,
-      opacity: 1,
-      duration: 2.5,
-      stagger: 0.4,
-      ease: 'back.out(1.7)'
-    })
-
-    // Start typing effect after logo animation
-    let currentIndex = 0
-    const typewriterDelay = setTimeout(() => {
-      const typeInterval = setInterval(() => {
-        if (currentIndex <= fullText.length) {
-          setButtonText(fullText.slice(0, currentIndex))
-          currentIndex++
-        } else {
-          clearInterval(typeInterval)
-          gsap.to('.enter-button', {
-            opacity: 1,
-            duration: 0.5
-          })
-        }
-      }, 100)
-
-      return () => clearInterval(typeInterval)
-    }, 2500)
-
     return () => {
-      clearTimeout(typewriterDelay)
-      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mousemove', handleMouseMove)
       renderer.dispose()
     }
   }, [isTransitioning])
+
+  useEffect(() => {
+    gsap.to('.letter', {
+      opacity: 1,
+      y: 0,
+      stagger: 0.1,
+      delay: 0.5,
+      ease: 'power2.out'
+    })
+  }, [])
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black">
@@ -130,13 +180,6 @@ export default function LandingPage() {
           ))}
           <sup className="text-6xl relative -top-20 letter opacity-0">3</sup>
         </h1>
-        <button 
-          className="enter-button mt-24 opacity-0 font-['Daydream'] text-2xl text-white hover:scale-110 transition-transform duration-200 relative mx-auto block pointer-events-auto"
-          onClick={() => setIsTransitioning(true)}
-        >
-          {buttonText}
-          <span className="animate-blink">|</span>
-        </button>
       </div>
     </div>
   )
