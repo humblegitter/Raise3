@@ -325,19 +325,19 @@ export default function LandingPage() {
                 </h1>
               </div>
               <p 
-                className="absolute bottom-44 text-cyan-400 font-mono text-lg opacity-0"
+                className="absolute bottom-52 md:bottom-44 text-cyan-400 font-mono text-lg opacity-0"
                 style={{ transform: 'translateY(20px)' }}
               >
                 Launching April 2025...
               </p>
               <button 
-                className="absolute bottom-28 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
+                className="absolute bottom-36 md:bottom-28 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
                 style={{ transform: 'translateY(20px)' }}
                 onClick={() => window.open('https://app.gitbook.com/invite/RchIfOacX2i9zA51W2fm/oeBqz13ORTmzaPOd8ynP', '_blank')}
               >
                 Documentation
               </button>
-              <div className="absolute bottom-12">
+              <div className="absolute bottom-16 md:bottom-12">
                 <button 
                   className="absolute bottom-2 left-1/2 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-12 py-1.5 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300 whitespace-nowrap"
                   style={{ transform: 'translate(-50%, 20px)' }}
