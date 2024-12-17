@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
-import Section2 from './Section2'
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -258,12 +257,20 @@ export default function LandingPage() {
       })
 
       // After the logo animation
+      gsap.to('p', {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        delay: 1.75 // Appears after logo, before documentation button
+      })
+
       gsap.to('button', {
         opacity: 1,
         y: 0,
         duration: 0.5,
         ease: 'power2.out',
-        delay: 2 // Adjust this delay to appear after logo moves up
+        delay: 2 // Keeps existing delay
       })
 
       // Cleanup
@@ -280,8 +287,8 @@ export default function LandingPage() {
 
   return (
     <div className="relative">
-      {/* First section with globe - removed fixed positioning */}
-      <div className="relative h-screen overflow-hidden bg-black">
+      {/* Single section with fixed height */}
+      <div className="h-screen overflow-hidden bg-black">
         {isLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -316,6 +323,12 @@ export default function LandingPage() {
                   </sup>
                 </h1>
               </div>
+              <p 
+                className="absolute bottom-44 text-cyan-400 font-mono text-lg opacity-0"
+                style={{ transform: 'translateY(20px)' }}
+              >
+                Launching April 2025...
+              </p>
               <button 
                 className="absolute bottom-32 text-cyan-400 font-mono text-xl opacity-0"
                 style={{ transform: 'translateY(20px)' }}
@@ -325,11 +338,6 @@ export default function LandingPage() {
             </div>
           </>
         )}
-      </div>
-
-      {/* Second section - no more marginTop needed */}
-      <div>
-        <Section2 />
       </div>
     </div>
   )
