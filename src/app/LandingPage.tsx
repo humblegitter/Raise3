@@ -2,13 +2,16 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { useAccount } from 'wagmi'
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState(0)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const mouseRef = useRef(new THREE.Vector2())
+  const { openConnectModal } = useConnectModal()
+  const { address, isConnected } = useAccount()
 
   useEffect(() => {
     // Simulate loading progress
@@ -333,13 +336,19 @@ export default function LandingPage() {
               >
                 Documentation
               </button>
-              <button 
-                className="absolute bottom-12 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
-                style={{ transform: 'translateY(20px)' }}
-                onClick={() => {}}
-              >
-                Connect Wallet
-              </button>
+              <div className="absolute bottom-12">
+                <button 
+                  className="absolute bottom-2 left-1/2 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-12 py-1.5 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300 whitespace-nowrap"
+                  style={{ transform: 'translate(-50%, 20px)' }}
+                  onClick={openConnectModal}
+                >
+                  {isConnected ? (
+                    `${address?.substring(0, 6)}...${address?.substring(38)}`
+                  ) : (
+                    'Connect Wallet'
+                  )}
+                </button>
+              </div>
             </div>
           </>
         )}
