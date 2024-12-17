@@ -9,9 +9,7 @@ export default function LandingPage() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const globeRef = useRef<THREE.Mesh>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
-  const raycasterRef = useRef(new THREE.Raycaster())
   const mouseRef = useRef(new THREE.Vector2())
-  const particlesRef = useRef<THREE.Mesh[]>([])
 
   useEffect(() => {
     // Simulate loading progress
@@ -117,7 +115,6 @@ export default function LandingPage() {
       // Mouse movement handler
       let mouseX = 0
       let mouseY = 0
-      const baseRadius = 5  // Store original radius
 
       const handleMouseMove = (e: MouseEvent) => {
         if (!isTransitioning) {
@@ -283,7 +280,7 @@ export default function LandingPage() {
         })
       }
     }
-  }, [isLoading])
+  }, [isLoading, isTransitioning])
 
   return (
     <div className="relative">
