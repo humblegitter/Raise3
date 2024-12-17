@@ -330,8 +330,9 @@ export default function LandingPage() {
                 Launching April 2025...
               </p>
               <button 
-                className="absolute bottom-32 text-cyan-400 font-mono text-xl opacity-0"
+                className="absolute bottom-32 text-cyan-400 font-mono text-xl opacity-0 hover:text-white transition-colors duration-300"
                 style={{ transform: 'translateY(20px)' }}
+                onClick={() => window.open('https://app.gitbook.com/invite/RchIfOacX2i9zA51W2fm/oeBqz13ORTmzaPOd8ynP', '_blank')}
               >
                 [ Documentation ]
               </button>
