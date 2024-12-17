@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
+import Section2 from './Section2'
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -210,56 +211,109 @@ export default function LandingPage() {
       }
       animate()
 
-      // Initialize GSAP animation for text after Three.js is ready
-      gsap.to('.letter', {
-        opacity: 1,
-        y: 0,
-        stagger: 0.1,
-        delay: 0.5,
-        ease: 'power2.out'
+      // Initial animation for letters
+      gsap.fromTo('.letter', 
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.5,
+          ease: 'power2.out',
+          onComplete: () => {
+            // After letters fade in, move logo to top
+            gsap.to('.logo-container', {
+              y: '-35vh', // Move up
+              scale: 0.5, // Make smaller
+              duration: 1,
+              ease: 'power2.inOut',
+              delay: 0.5 // Wait a bit before starting
+            })
+          }
+        }
+      )
+
+      // Hover effects
+      const letters = document.querySelectorAll('.letter')
+      letters.forEach((letter) => {
+        letter.addEventListener('mouseenter', () => {
+          gsap.to(letter, {
+            scale: 1.2,
+            y: -10,
+            color: '#00ffff',
+            duration: 0.3,
+            ease: 'power2.out'
+          })
+        })
+
+        letter.addEventListener('mouseleave', () => {
+          gsap.to(letter, {
+            scale: 1,
+            y: 0,
+            color: '#ffffff',
+            duration: 0.3,
+            ease: 'power2.in'
+          })
+        })
       })
 
+      // Cleanup
       return () => {
         window.removeEventListener('mousemove', handleMouseMove)
-        window.removeEventListener('wheel', handleScroll)
         renderer.dispose()
+        letters.forEach((letter) => {
+          letter.removeEventListener('mouseenter', () => {})
+          letter.removeEventListener('mouseleave', () => {})
+        })
       }
     }
   }, [isLoading])
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black">
-      {isLoading ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-cyan-400 transition-all duration-300 ease-out"
-              style={{ width: `${loadingProgress}%` }}
-            />
+    <div className="relative">
+      {/* First section with globe - removed fixed positioning */}
+      <div className="relative h-screen overflow-hidden bg-black">
+        {isLoading ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-cyan-400 transition-all duration-300 ease-out"
+                style={{ width: `${loadingProgress}%` }}
+              />
+            </div>
+            <div className="text-cyan-400 mt-4 font-mono">
+              Loading... {loadingProgress}%
+            </div>
           </div>
-          <div className="text-cyan-400 mt-4 font-mono">
-            Loading... {loadingProgress}%
-          </div>
-        </div>
-      ) : (
-        <>
-          <div id="globe-container" className="absolute inset-0" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <h1 className="text-9xl font-['Daydream'] text-white z-10">
-              {["R","A","I","S","E"].map((letter, index) => (
-                <span 
-                  key={index} 
-                  className="letter opacity-0 inline-block"
-                  style={{ transform: 'translateY(20px)' }}
+        ) : (
+          <>
+            <div id="globe-container" className="absolute inset-0" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <h1 className="text-9xl font-['Daydream'] text-white z-10">
+                {["R","A","I","S","E"].map((letter, index) => (
+                  <span 
+                    key={index} 
+                    className="letter opacity-0 inline-block cursor-pointer transition-all duration-300"
+                    style={{ transform: 'translateY(20px)' }}
+                  >
+                    {letter}
+                  </span>
+                ))}
+                <sup 
+                  className="text-6xl relative -top-20 letter opacity-0 cursor-pointer transition-all duration-300"
                 >
-                  {letter}
-                </span>
-              ))}
-              <sup className="text-6xl relative -top-20 letter opacity-0">3</sup>
-            </h1>
-          </div>
-        </>
-      )}
+                  3
+                </sup>
+              </h1>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Second section - no more marginTop needed */}
+      <div>
+        <Section2 />
+      </div>
     </div>
   )
 }
