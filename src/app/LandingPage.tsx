@@ -6,7 +6,6 @@ import * as THREE from 'three'
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
   const globeRef = useRef<THREE.Mesh>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const mouseRef = useRef(new THREE.Vector2())
@@ -94,11 +93,49 @@ export default function LandingPage() {
         )
       }
 
-      globeRef.current = particles[0]
+    
 
       // Enhanced lighting setup
       const ambientLight = new THREE.AmbientLight(0x444444, 1.2)
       scene.add(ambientLight)
+
+      // Typewriter effect for launch date
+      const text = "Launching April 2025..."
+      const launchText = document.querySelector('p')
+      if (launchText) {
+        launchText.textContent = ''
+        gsap.to(launchText, { opacity: 1, duration: 0.1 })
+        
+        const launchDuration = text.length * 0.1 // Calculate total duration
+        
+        text.split('').forEach((char, i) => {
+          gsap.to(launchText, {
+            duration: 0.1,
+            delay: 2 + (i * 0.1),
+            onStart: () => {
+              launchText.textContent = text.substring(0, i + 1)
+            }
+          })
+        })
+
+        // Typewriter effect for documentation button
+        const buttonText = "[ Documentation ]"
+        const docButton = document.querySelector('button')
+        if (docButton) {
+          docButton.textContent = ''
+          gsap.to(docButton, { opacity: 1, duration: 0.1 })
+          
+          buttonText.split('').forEach((char, i) => {
+            gsap.to(docButton, {
+              duration: 0.1,
+              delay: 2 + launchDuration + 0.5 + (i * 0.1), // Start after launch text + small pause
+              onStart: () => {
+                docButton.textContent = buttonText.substring(0, i + 1)
+              }
+            })
+          })
+        }
+      }
 
       // Main directional light
       const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
@@ -117,91 +154,58 @@ export default function LandingPage() {
       let mouseY = 0
 
       const handleMouseMove = (e: MouseEvent) => {
-        if (!isTransitioning) {
-          mouseX = (e.clientX / window.innerWidth - 0.5) * 2
-          mouseY = -(e.clientY / window.innerHeight - 0.5) * 2
-        } else {
-          mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
-          mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1
-        }
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2
+        mouseY = -(e.clientY / window.innerHeight - 0.5) * 2
+        mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
+        mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1
       }
 
       window.addEventListener('mousemove', handleMouseMove)
-
-      // Add scroll listener
-      const handleScroll = () => {
-        if (!isTransitioning) {
-          setIsTransitioning(true)
-          
-          // Implode animation
-          particles.forEach((particle, i) => {
-            gsap.to(particle.position, {
-              x: 0,
-              y: 0,
-              z: 0,
-              duration: 1.5,
-              ease: "power2.in",
-              delay: i / particles.length * 0.5
-            })
-            
-            // Fade out
-            gsap.to(particle.material, {
-              opacity: 0,
-              duration: 1,
-              delay: i / particles.length * 0.5
-            })
-          })
-        }
-      }
-
-      window.addEventListener('wheel', handleScroll)
 
       // Animation loop
       const animate = () => {
         requestAnimationFrame(animate)
         
-        if (!isTransitioning) {
-          const time = Date.now() * 0.0005
+        const time = Date.now() * 0.0005
+        
+        particles.forEach((particle, i) => {
+          // Base sphere position
+          const phi = Math.acos(-1 + (2 * i) / particles.length)
+          const theta = Math.sqrt(particles.length * Math.PI) * phi + time
           
-          particles.forEach((particle, i) => {
-            // Base sphere position
-            const phi = Math.acos(-1 + (2 * i) / particles.length)
-            const theta = Math.sqrt(particles.length * Math.PI) * phi + time
+          // Set base position
+          particle.position.x = radius * Math.sin(phi) * Math.cos(theta)
+          particle.position.y = radius * Math.cos(phi)
+          particle.position.z = radius * Math.sin(phi) * Math.sin(theta)
+          
+          // Calculate distance and angle to mouse
+          const mousePos = new THREE.Vector3(mouseX * 10, -mouseY * 10, 0)
+          const distanceToMouse = particle.position.distanceTo(mousePos)
+          
+          // Vortex effect
+          if (distanceToMouse < 5) {  // Affect particles within range
+            const angle = Math.atan2(
+              particle.position.z - mousePos.z,
+              particle.position.x - mousePos.x
+            )
             
-            // Set base position
-            particle.position.x = radius * Math.sin(phi) * Math.cos(theta)
-            particle.position.y = radius * Math.cos(phi)
-            particle.position.z = radius * Math.sin(phi) * Math.sin(theta)
+            // Create spiral motion
+            const spiralStrength = Math.max(0, 1 - distanceToMouse * 0.2) * 2.0
+            const spiralX = Math.cos(angle + time * 5) * spiralStrength
+            const spiralZ = Math.sin(angle + time * 5) * spiralStrength
             
-            // Calculate distance and angle to mouse
-            const mousePos = new THREE.Vector3(mouseX * 10, -mouseY * 10, 0)
-            const distanceToMouse = particle.position.distanceTo(mousePos)
+            particle.position.x += spiralX
+            particle.position.z += spiralZ
             
-            // Vortex effect
-            if (distanceToMouse < 5) {  // Affect particles within range
-              const angle = Math.atan2(
-                particle.position.z - mousePos.z,
-                particle.position.x - mousePos.x
-              )
-              
-              // Create spiral motion
-              const spiralStrength = Math.max(0, 1 - distanceToMouse * 0.2) * 2.0
-              const spiralX = Math.cos(angle + time * 5) * spiralStrength
-              const spiralZ = Math.sin(angle + time * 5) * spiralStrength
-              
-              particle.position.x += spiralX
-              particle.position.z += spiralZ
-              
-              // Pull slightly toward mouse
-              const pullStrength = Math.max(0, 1 - distanceToMouse * 0.2) * 0.1
-              particle.position.lerp(mousePos, pullStrength)
-            }
-            
-            // Glow effect
-            const glowIntensity = Math.max(0.5, 2 - distanceToMouse * 0.2)
-            ;(particle.material as THREE.MeshPhongMaterial).emissiveIntensity = glowIntensity
-          })
-        }
+            // Pull slightly toward mouse
+            const pullStrength = Math.max(0, 1 - distanceToMouse * 0.2) * 0.1
+            particle.position.lerp(mousePos, pullStrength)
+          }
+          
+          // Glow effect
+          const glowIntensity = Math.max(0.5, 2 - distanceToMouse * 0.2)
+          ;(particle.material as THREE.MeshPhongMaterial).emissiveIntensity = glowIntensity
+        })
 
         renderer.render(scene, camera)
       }
@@ -280,7 +284,7 @@ export default function LandingPage() {
         })
       }
     }
-  }, [isLoading, isTransitioning])
+  }, [isLoading])
 
   return (
     <div className="relative">
