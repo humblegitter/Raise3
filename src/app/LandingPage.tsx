@@ -6,7 +6,6 @@ import * as THREE from 'three'
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState(0)
-  const globeRef = useRef<THREE.Mesh>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const mouseRef = useRef(new THREE.Vector2())
 
