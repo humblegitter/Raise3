@@ -257,6 +257,15 @@ export default function LandingPage() {
         })
       })
 
+      // After the logo animation
+      gsap.to('button', {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        delay: 2 // Adjust this delay to appear after logo moves up
+      })
+
       // Cleanup
       return () => {
         window.removeEventListener('mousemove', handleMouseMove)
@@ -289,22 +298,30 @@ export default function LandingPage() {
           <>
             <div id="globe-container" className="absolute inset-0" />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <h1 className="text-9xl font-['Daydream'] text-white z-10">
-                {["R","A","I","S","E"].map((letter, index) => (
-                  <span 
-                    key={index} 
-                    className="letter opacity-0 inline-block cursor-pointer transition-all duration-300"
-                    style={{ transform: 'translateY(20px)' }}
+              <div className="logo-container">
+                <h1 className="text-9xl font-['Daydream'] text-white z-10">
+                  {["R","A","I","S","E"].map((letter, index) => (
+                    <span 
+                      key={index} 
+                      className="letter opacity-0 inline-block transition-all duration-300"
+                      style={{ transform: 'translateY(20px)' }}
+                    >
+                      {letter}
+                    </span>
+                  ))}
+                  <sup 
+                    className="text-6xl relative -top-20 letter opacity-0 transition-all duration-300"
                   >
-                    {letter}
-                  </span>
-                ))}
-                <sup 
-                  className="text-6xl relative -top-20 letter opacity-0 cursor-pointer transition-all duration-300"
-                >
-                  3
-                </sup>
-              </h1>
+                    3
+                  </sup>
+                </h1>
+              </div>
+              <button 
+                className="absolute bottom-32 text-cyan-400 font-mono text-xl opacity-0"
+                style={{ transform: 'translateY(20px)' }}
+              >
+                [ Documentation ]
+              </button>
             </div>
           </>
         )}
