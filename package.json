@@ -9,13 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.1",
     "@react-three/drei": "^9.92.1",
     "@react-three/fiber": "^8.15.12",
+    "@tanstack/react-query": "^5.62.8",
     "gsap": "^3.12.4",
     "next": "15.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.159.0"
+    "three": "^0.159.0",
+    "viem": "^2.21.55",
+    "wagmi": "^2.14.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

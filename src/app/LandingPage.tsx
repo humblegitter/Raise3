@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -259,13 +260,14 @@ export default function LandingPage() {
         delay: 1.75
       })
 
-      gsap.to('button', {
+      gsap.set('.wallet-button', { opacity: 0, y: 20 })
+      gsap.to('.wallet-button', {
         opacity: 1,
         y: 0,
         duration: 0.5,
         ease: 'power2.out',
         delay: 2,
-        stagger: 0.5 // Add stagger for sequential button animations
+        stagger: 0.5
       })
 
       // Cleanup
@@ -332,9 +334,9 @@ export default function LandingPage() {
                 Documentation
               </button>
               <button 
-                className="absolute bottom-8 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
+                className="absolute bottom-12 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-6 py-2 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300"
                 style={{ transform: 'translateY(20px)' }}
-                onClick={() => console.log('Connect wallet clicked')}
+                onClick={() => {}}
               >
                 Connect Wallet
               </button>
