@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { useConnectModal, useAccountModal } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
 
 export default function LandingPage() {
@@ -11,6 +11,7 @@ export default function LandingPage() {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const mouseRef = useRef(new THREE.Vector2())
   const { openConnectModal } = useConnectModal()
+  const { openAccountModal } = useAccountModal()
   const { address, isConnected } = useAccount()
 
   useEffect(() => {
@@ -340,7 +341,7 @@ export default function LandingPage() {
                 <button 
                   className="absolute bottom-2 left-1/2 text-cyan-400 font-mono text-xl opacity-0 border-2 border-cyan-400 px-12 py-1.5 rounded-lg hover:bg-cyan-400/10 transition-colors duration-300 whitespace-nowrap"
                   style={{ transform: 'translate(-50%, 20px)' }}
-                  onClick={openConnectModal}
+                  onClick={isConnected ? openAccountModal : openConnectModal}
                 >
                   {isConnected ? (
                     `${address?.substring(0, 6)}...${address?.substring(38)}`
