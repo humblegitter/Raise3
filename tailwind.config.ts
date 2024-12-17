@@ -12,6 +12,9 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        daydream: ['var(--font-daydream)'],
+      },
     },
   },
   plugins: [],
