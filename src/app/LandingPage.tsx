@@ -145,7 +145,20 @@ export default function LandingPage() {
       rimLight.position.set(-5, 0, -5)
       scene.add(rimLight)
 
-      camera.position.z = 15
+      // Adjust camera position based on screen width
+      const isMobile = window.innerWidth < 768 // md breakpoint in Tailwind
+      camera.position.z = isMobile ? 20 : 15
+
+      // Handle window resize
+      const handleResize = () => {
+        const isMobile = window.innerWidth < 768
+        camera.position.z = isMobile ? 20 : 15
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      }
+
+      window.addEventListener('resize', handleResize)
 
       // Mouse movement handler
       let mouseX = 0
@@ -277,6 +290,7 @@ export default function LandingPage() {
       // Cleanup
       return () => {
         window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('resize', handleResize)
         renderer.dispose()
         letters.forEach((letter) => {
           letter.removeEventListener('mouseenter', () => {})
